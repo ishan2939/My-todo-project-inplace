@@ -65,6 +65,8 @@ pipeline {
             //     }
             // }
 
+                                    sh "docker logout public.ecr.aws"
+
              sh "docker tag ${IMAGE_REPO_NAME}:${IMAGE_TAG} ${REPOSITORY_URI}:latest"
                     sh 'docker push public.ecr.aws/s0z9h6z8/my_todo_backend:latest' 
          }
