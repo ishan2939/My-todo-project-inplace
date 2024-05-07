@@ -42,7 +42,7 @@ pipeline {
 
             // sh "aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/s0z9h6z8"
             
-            sh "aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/s0z9h6z8"
+            // sh "aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/s0z9h6z8"
 
 			// docker.withRegistry("https://" + REPOSITORY_URI) {
             //         	dockerImage.push()
