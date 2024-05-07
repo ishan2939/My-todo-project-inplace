@@ -12,7 +12,7 @@ pipeline {
         IMAGE_TAG="${env.BUILD_ID}"
         //Do not edit REPOSITORY_URI.
         REPOSITORY_URI = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${IMAGE_REPO_NAME}"
-	    registryCredential = "<REPLACE WITH NAME OF AWS CREDENTIAL>"
+	    registryCredential = "AKIAZQ3DSWKP4LZEA2H7"
 	    JOB_NAME = "${env.JOB_NAME}"
 	    TEST_CONTAINER_NAME = "${JOB_NAME}-test-server"
     
@@ -39,7 +39,7 @@ pipeline {
     stage('Releasing') {
      steps{  
          script {
-			docker.withRegistry("https://" + REPOSITORY_URI, "ecr:${AWS_DEFAULT_REGION}") {
+			docker.withRegistry("https://" + REPOSITORY_URI, "ecr:${AWS_DEFAULT_REGION}:" + registryCredential) {
                     	dockerImage.push()
             }
          }
