@@ -12,7 +12,7 @@ pipeline {
         IMAGE_TAG="${env.BUILD_ID}"
         //Do not edit REPOSITORY_URI.
         REPOSITORY_URI = "public.ecr.aws/s0z9h6z8/${IMAGE_REPO_NAME}"
-	    registryCredential = "AKIAZQ3DSWKP4LZEA2H7"
+	    registryCredential = "aws-credentials"
 	    JOB_NAME = "${env.JOB_NAME}"
 	    TEST_CONTAINER_NAME = "${JOB_NAME}-test-server"
     
