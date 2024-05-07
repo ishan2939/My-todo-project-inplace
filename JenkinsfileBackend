@@ -39,8 +39,9 @@ pipeline {
     stage('Releasing') {
      steps{  
          script {
+            echo "https://${REPOSITORY_URI}"
 			docker.withRegistry("https://" + REPOSITORY_URI) {
-                    	dockerImage.push()
+                dockerImage.push()
             }
          }
        }
