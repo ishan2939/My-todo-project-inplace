@@ -45,7 +45,7 @@ pipeline {
             //         	dockerImage.push()
             // }
 
-            sh 'docker push public.ecr.aws/s0z9h6z8/my_todo_frontend:latest'
+            sh 'docker push public.ecr.aws/s0z9h6z8/my_todo_backend:latest'
 
          }
        }
