@@ -26,7 +26,7 @@ pipeline {
         }
         post {
           success {
-              echo '******************Build stage successfull**********************'
+            echo '******************Build stage successfull**********************'
           }
         }
       }
@@ -36,15 +36,15 @@ pipeline {
         steps{  
           script {
               
-              sh "aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/s0z9h6z8"
+            sh "aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/s0z9h6z8"
 
-              sh "docker tag ${IMAGE_REPO_NAME}:${IMAGE_TAG} ${REPOSITORY_URI}:latest"
-              sh "docker push ${REPOSITORY_URI}:latest"
+            sh "docker tag ${IMAGE_REPO_NAME}:${IMAGE_TAG} ${REPOSITORY_URI}:latest"
+            sh "docker push ${REPOSITORY_URI}:latest"
           }
         }
         post {
           success {
-              echo '******************Releasing stage successfull**********************'
+            echo '******************Releasing stage successfull**********************'
           }
         }
       }
@@ -54,22 +54,25 @@ pipeline {
         steps{
           withAWS(credentials: registryCredential, region: "${AWS_DEFAULT_REGION}") {
             script {
-                // sh "chmod +x -R ${env.WORKSPACE}"
-                // sh './script.sh'
-                sh "aws ecs update-service --cluster ${CLUSTER_NAME} --service ${SERVICE_NAME} --force-new-deployment"
+              // sh "chmod +x -R ${env.WORKSPACE}"
+              // sh './script.sh'
+              sh "aws ecs update-service --cluster ${CLUSTER_NAME} --service ${SERVICE_NAME} --force-new-deployment"
+
+              sh "aws ecs wait services-stable --cluster ${CLUSTER_NAME} --services ${SERVICE_NAME}"
+
             }
           } 
         }
         post {
           success {
-              echo '******************Deploy stage successfull**********************'
+            echo '******************Deploy stage successfull**********************'
           }
         }
       }
     }
 
     post {
-        always {
+      always {
         sh 'docker system prune -a -f'
       }
     }
