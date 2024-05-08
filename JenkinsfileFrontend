@@ -1,0 +1,76 @@
+pipeline {
+    agent any
+    environment {
+      AWS_ACCOUNT_ID="654654485151"
+      AWS_DEFAULT_REGION="us-east-1"
+      CLUSTER_NAME="My_todo_Cluster"
+      SERVICE_NAME="Frontend_Service"
+      TASK_DEFINITION_NAME="My_todo_task_definition_Frontend"
+      DESIRED_COUNT="1"
+      IMAGE_REPO_NAME="my_todo_frontend"
+      IMAGE_TAG="${env.BUILD_ID}"
+      REPOSITORY_URI = "public.ecr.aws/s0z9h6z8/${IMAGE_REPO_NAME}"
+      registryCredential = "aws-credentials"
+      JOB_NAME = "${env.JOB_NAME}" 
+      TEST_CONTAINER_NAME = "${JOB_NAME}-test-server"
+    }
+   
+    stages {
+
+      // Building Docker image
+      stage('Building image') {
+        steps{
+          script {
+            dockerImage = docker.build "${IMAGE_REPO_NAME}:${IMAGE_TAG}" , "./frontend/"
+          }
+        }
+        post {
+          success {
+              echo '******************Build stage successfull**********************'
+          }
+        }
+      }
+
+      // Uploading Docker image into AWS ECR
+      stage('Releasing') {
+        steps{  
+          script {
+              
+              sh "aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/s0z9h6z8"
+
+              sh "docker tag ${IMAGE_REPO_NAME}:${IMAGE_TAG} ${REPOSITORY_URI}:latest"
+              sh "docker push ${REPOSITORY_URI}:latest"
+          }
+        }
+        post {
+          success {
+              echo '******************Releasing stage successfull**********************'
+          }
+        }
+      }
+
+      // Update task definition and service running in ECS cluster to deploy
+      stage('Deploy') {
+        steps{
+          withAWS(credentials: registryCredential, region: "${AWS_DEFAULT_REGION}") {
+            script {
+                // sh "chmod +x -R ${env.WORKSPACE}"
+                // sh './script.sh'
+                sh "aws ecs update-service --cluster ${CLUSTER_NAME} --service ${SERVICE_NAME} --force-new-deployment"
+            }
+          } 
+        }
+        post {
+          success {
+              echo '******************Deploy stage successfull**********************'
+          }
+        }
+      }
+    }
+
+    post {
+        always {
+        sh 'docker system prune -a -f'
+      }
+    }
+ }
