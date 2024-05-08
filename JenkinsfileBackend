@@ -44,6 +44,8 @@ pipeline {
             
             sh "aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/s0z9h6z8"
 
+            sh "docker tag ${IMAGE_REPO_NAME}:${IMAGE_TAG} ${REPOSITORY_URI}:latest"
+            sh 'docker push public.ecr.aws/s0z9h6z8/my_todo_backend:latest' 
 			// docker.withRegistry("https://" + REPOSITORY_URI) {
             //         	dockerImage.push()
             // }
@@ -68,9 +70,6 @@ pipeline {
             // }
 
             // sh "docker logout public.ecr.aws"
-
-            sh "docker tag ${IMAGE_REPO_NAME}:${IMAGE_TAG} ${REPOSITORY_URI}:latest"
-            sh 'docker push public.ecr.aws/s0z9h6z8/my_todo_backend:latest' 
          }
        }
      }
@@ -80,8 +79,9 @@ pipeline {
      steps{
             withAWS(credentials: registryCredential, region: "${AWS_DEFAULT_REGION}") {
                 script {
-			sh "chmod +x -R ${env.WORKSPACE}"
-			sh './script.sh'
+                    // sh "chmod +x -R ${env.WORKSPACE}"
+                    // sh './script.sh'
+                    sh "aws ecs update-service --cluster ${CLUSTER_NAME} --service ${SERVICE_NAME} --force-new-deployment"
                 }
             } 
          }
